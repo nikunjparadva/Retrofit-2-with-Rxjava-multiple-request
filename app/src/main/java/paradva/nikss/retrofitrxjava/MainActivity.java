@@ -2,8 +2,9 @@ package paradva.nikss.retrofitrxjava;
 
 import android.os.Bundle;
 import android.os.StrictMode;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +12,13 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import paradva.nikss.retrofitrxjava.model.DataaResponse;
+import io.reactivex.schedulers.Schedulers;
+import paradva.nikss.retrofitrxjava.model.GenderResponce;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,52 +26,43 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
-        StrictMode.setThreadPolicy(policy);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/browsedates/v1.0/IN/INR/en-US/STV-sky/JAI-sky/")
+                .baseUrl("https://api.genderize.io/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
-        List<Observable<DataaResponse>> requests = new ArrayList<>();
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2019-05"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2019-06"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2019-07"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2019-08"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2019-09"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2019-10"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2019-11"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2019-12"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2020-01"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2020-02"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2020-03"));
-        requests.add(retrofit.create(ListingApiService.class).findCheapDates("2020-04"));
+        List<Observable<GenderResponce>> requests = new ArrayList<>();
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Beverly"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Philip"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Henry"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Russell"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Ann"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Jason"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Billy"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Stephanie"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Douglas"));
+        requests.add(retrofit.create(ListingApiService.class).findCheapDates("Nikunj"));
         Log.e("onSubscribe", "START: ");
         Observable.zip(
                 requests,
-                new Function<Object[], List<DataaResponse>>() {
+                new Function<Object[], List<GenderResponce>>() {
                     @Override
-                    public List<DataaResponse> apply(Object[] objects) throws Exception {
+                    public List<GenderResponce> apply(Object[] objects) throws Exception {
                         Log.e("onSubscribe", "apply: " + objects.length);
-                        List<DataaResponse> dataaResponses = new ArrayList<>();
+                        List<GenderResponce> genderResponces = new ArrayList<>();
                         for (Object o : objects) {
-                            dataaResponses.add((DataaResponse) o);
+                            genderResponces.add((GenderResponce) o);
                         }
-                        return dataaResponses;
+                        return genderResponces;
                     }
-                })
+                }).subscribeOn(Schedulers.io())
                 .subscribe(
-                        new Consumer<List<DataaResponse>>() {
+                        new Consumer<List<GenderResponce>>() {
                             @Override
-                            public void accept(List<DataaResponse> dataaResponses) throws Exception {
-//                                String s1 = dataaResponses.toString();
-//                                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-//                                ClipData clip = ClipData.newPlainText("label", s1);
-//                                clipboard.setPrimaryClip(clip);
-                                Log.e("onSubscribe", "YOUR DATA IS HERE: "+dataaResponses);
+                            public void accept(List<GenderResponce> dataaResponses) throws Exception {
+                                Log.e("onSubscribe", "YOUR DATA IS HERE: " + dataaResponses);
                             }
                         },
 
@@ -83,15 +75,8 @@ public class MainActivity extends AppCompatActivity {
                 );
     }
 
-    public static final String X_RAPIDAPI_HOST = "X-RapidAPI-Host";
-    public static final String X_RAPIDAPI_HOST_VALUE = "skyscanner-skyscanner-flight-search-v1.p.rapidapi.com";
-    public static final String X_RAPIDAPI_API = "X-RapidAPI-Key";
-    public static final String X_RAPIDAPI_API_VALUE = "f22f26d595msh4dd6f6793cedee2p111709jsnb273fbb253cc";
-
     public interface ListingApiService {
-        @Headers({X_RAPIDAPI_HOST + ": " + X_RAPIDAPI_HOST_VALUE,
-                X_RAPIDAPI_API + ": " + X_RAPIDAPI_API_VALUE})
-        @GET("{id}")
-        Observable<DataaResponse> findCheapDates(@Path("id") String id);
+        @GET(".")
+        Observable<GenderResponce> findCheapDates(@Query("name") String name);
     }
 }
