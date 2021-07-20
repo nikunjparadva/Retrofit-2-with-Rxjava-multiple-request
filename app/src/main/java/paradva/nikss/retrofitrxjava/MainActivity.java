@@ -1,10 +1,8 @@
 package paradva.nikss.retrofitrxjava;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import java.util.ArrayList;
